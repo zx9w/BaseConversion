@@ -9,6 +9,10 @@ import qualified Data.ByteString as B
 > import Data.Char
 > import Data.List
 
+Not an import but almost:
+
+> if' :: Bool -> a -> a -> a
+> if' b x y = if b then x else y
 
 Here is the base16, base32 and base64 reference: https://tools.ietf.org/html/rfc4648
 
@@ -25,8 +29,13 @@ Okay I found a different solution:
 
 > mkSyms :: Base -> String
 > mkSyms Base16 = "0123456789ABCDEF"
-> mkSyms Base32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567="
-> mkSyms Base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_="
+> mkSyms Base32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+> mkSyms Base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+
+This solution has clear drawbacks!
+1. We have multiple alphabets for Base64 and Base32
+2. Padding issues.
+
 
 Base 32 and 64 require a further check to see if it has a legal padding.
 
@@ -50,7 +59,7 @@ Note: flip id == \x f -> f x ~~ That is to say this is actually super simple.
 > check' base cstr = 0 == (length $ foldl (flip id) cstr $ filters $ mkSyms base)
 >   where
 >     filters :: String -> [String -> String]
->     filters str = (filter . (/=)) <$> str
+>     filters str = (filter . (/=)) <$> (if' (Base16==base) str $ str++"=")
 
 > check :: Base -> String -> Bool
 > check base str = (check' base str) && (checkPadding base str)
