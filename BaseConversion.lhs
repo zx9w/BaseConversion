@@ -157,8 +157,8 @@ Now we can start using these functions to decode and encode data.
 
 The main workhorse will be this function:
 
-> change :: Int -> Int -> [Int] -> [Int]
-> change fromSize toSize ints = toInts toSize (fromInts fromSize ints)
+> changeSize :: Int -> Int -> [Int] -> [Int]
+> changeSize fromSize toSize ints = toInts toSize (fromInts fromSize ints)
 
 As well as the decoding bootstrap function.
 
@@ -172,10 +172,10 @@ As well as the decoding bootstrap function.
 Now we can get enums that are equivalent to bytes from any Base.
 
 > changeBaseToBytes :: Base -> [Int] -> [Int]
-> changeBaseToBytes base ints = change (mkSize base) byteSize ints
+> changeBaseToBytes base ints = changeSize (mkSize base) byteSize ints
 
 > changeBytesToBase :: [Int] -> Base -> [Int]
-> changeBytesToBase bytes base = change byteSize (mkSize base) bytes
+> changeBytesToBase bytes base = changeSize byteSize (mkSize base) bytes
 
 So the next step is to change them into "Words" that we can write to file for example.
 
